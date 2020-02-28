@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>stdr_robot</name>
+    <!-- This is a meta package! -->
+    <version>0.3.2</version>
+    <description>A simple, flexible and scalable 2D multi-robot simulator.</description>
+    <maintainer email="zalidis@gmail.com">Chris Zalidis</maintainer>
+    <license>GPLv3</license>
+    <url type="website">http://stdr-simulator-ros-pkg.github.io</url>
+    <url type="bugtracker">https://github.com/stdr-simulator-ros-pkg/stdr_simulator/issues</url>
+    <url type="repository">https://github.com/stdr-simulator-ros-pkg/stdr_simulator</url>
+    <author>Manos Tsardoulias, Chris Zalidis, Aris Thallas</author>
+    <buildtool_depend>catkin</buildtool_depend>
+    <!-- <exec_depend>stdr_msgs</exec_depend> -->
+    <exec_depend>stdr_server</exec_depend>
+    <!-- <exec_depend>stdr_gui</exec_depend> -->
+    <!-- <exec_depend>stdr_launchers</exec_depend> -->
+    <exec_depend>stdr_resources</exec_depend>
+    <exec_depend>stdr_samples</exec_depend>
+    <exec_depend>stdr_parser</exec_depend>
+    <build_depend>stdr_parser</build_depend>
+    <!-- <build_depend>roscpp</build_depend><exec_depend>roscpp</exec_depend><build_depend>nodelet</build_depend><exec_depend>nodelet</exec_depend><build_depend>actionlib</build_depend><exec_depend>actionlib</exec_depend><build_depend>tf</build_depend><exec_depend>tf</exec_depend> -->
+    <depend>roscpp</depend>
+    <depend>tf</depend>
+    <depend>nav_msgs</depend>
+    <depend>stdr_msgs</depend>
+    <depend>actionlib</depend>
+    <depend>nodelet</depend>
+    <depend>map_server</depend>
+    <depend>yaml-cpp</depend>
+    <depend>visualization_msgs</depend>
+    <depend>geometry_msgs</depend>
+    <depend>sensor_msgs</depend>
+    <export>
+        <nodelet plugin="${prefix}/robot_plugins.xml" />
+    </export>
+    <!-- <export><metapackage/></export> -->
+</package>
