@@ -33,3 +33,5 @@ class Cell(object):
         # it, this is the necessary initial condition.
         self.pathCost = float("inf")
 
+    def __repr__(self):
+        return self.coords
