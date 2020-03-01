@@ -34,4 +34,4 @@ class Cell(object):
         self.pathCost = float("inf")
 
     def __repr__(self):
-        return self.coords
+        return str(self.coords)
