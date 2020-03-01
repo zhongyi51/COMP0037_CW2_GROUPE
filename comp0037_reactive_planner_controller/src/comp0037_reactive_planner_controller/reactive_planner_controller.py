@@ -38,8 +38,9 @@ class ReactivePlannerController(PlannerControllerBase):
 
         # If the route is not viable any more, call
         # self.controller.stopDrivingToCurrentGoal()
-        for x,y in self.currentPlannedPath.waypoints.coords:
+        for wp in self.currentPlannedPath.waypoints:
             # print wp, str(wp.label) # debug del
+            x,y = wp.coords
             print x,y, 'status = ', self.occupancyGrid.getCell(x,y)
 
         pass
