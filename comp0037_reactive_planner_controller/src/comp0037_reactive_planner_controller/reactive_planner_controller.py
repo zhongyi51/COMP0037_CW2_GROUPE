@@ -40,17 +40,13 @@ class ReactivePlannerController(PlannerControllerBase):
         # waypoints are in self.currentPlannedPath, can still be
         # traversed
 
-        # If the route is not viable any more, call
-        # self.controller.stopDrivingToCurrentGoal()
         for wp in self.currentPlannedPath.waypoints:
             x,y = wp.coords
             status = self.occupancyGrid.getCell(x,y)
-            # print x,y, 'status = ', status
-            if status == BLOCKED:
+            if status == BLOCKED: # check status from the continuously updating occupancy grid
                 print x,y, 'status = ', status, 'Now stop and replan'
-                self.controller.stopDrivingToCurrentGoal()
-
-        pass
+                self.controller.stopDrivingToCurrentGoal() # stop the robot
+                break
 
     def driveToGoal(self, goal):
 
