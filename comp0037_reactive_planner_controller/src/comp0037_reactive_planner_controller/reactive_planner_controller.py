@@ -7,6 +7,10 @@ from cell import CellLabel
 from planner_controller_base import PlannerControllerBase
 from comp0037_mapper.msg import *
 
+# from the definitions in occupancy_grid.py
+BLOCKED = 1
+FREE = 0
+
 class ReactivePlannerController(PlannerControllerBase):
 
     def __init__(self, occupancyGrid, planner, controller):
@@ -39,9 +43,12 @@ class ReactivePlannerController(PlannerControllerBase):
         # If the route is not viable any more, call
         # self.controller.stopDrivingToCurrentGoal()
         for wp in self.currentPlannedPath.waypoints:
-            # print wp, str(wp.label) # debug del
             x,y = wp.coords
-            print x,y, 'status = ', self.occupancyGrid.getCell(x,y)
+            status = self.occupancyGrid.getCell(x,y)
+            # print x,y, 'status = ', status
+            if status == BLOCKED:
+                print x,y, 'status = ', status, 'Now stop and replan'
+                self.controller.stopDrivingToCurrentGoal()
 
         pass
 
