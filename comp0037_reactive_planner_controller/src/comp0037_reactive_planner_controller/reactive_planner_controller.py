@@ -39,7 +39,7 @@ class ReactivePlannerController(PlannerControllerBase):
         # If the route is not viable any more, call
         # self.controller.stopDrivingToCurrentGoal()
         for wp in self.currentPlannedPath.waypoints:
-            print wp
+            print wp, str(wp.label)
 
         pass
 
