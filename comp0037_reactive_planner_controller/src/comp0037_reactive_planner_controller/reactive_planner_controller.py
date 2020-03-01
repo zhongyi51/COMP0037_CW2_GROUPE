@@ -14,6 +14,7 @@ class ReactivePlannerController(PlannerControllerBase):
 
         self.mapUpdateSubscriber = rospy.Subscriber('updated_map', MapUpdate, self.mapUpdateCallback)
         self.gridUpdateLock =  threading.Condition()
+        self.currentPlannedPath = None
 
     def mapUpdateCallback(self, mapUpdateMessage):
 
@@ -34,12 +35,14 @@ class ReactivePlannerController(PlannerControllerBase):
         # This methods needs to check if the current path, whose
         # waypoints are in self.currentPlannedPath, can still be
         # traversed
-                
+
         # If the route is not viable any more, call
         # self.controller.stopDrivingToCurrentGoal()
+        while self.currentPlannedPath:
+            print self.currentPlannedPath.popleft()
 
         pass
-    
+
     def driveToGoal(self, goal):
 
         # Get the goal coordinate in cells
@@ -49,7 +52,7 @@ class ReactivePlannerController(PlannerControllerBase):
         # stuck.
 
         goalReached = False
-        
+
         while (goalReached is False) & (rospy.is_shutdown() is False):
 
             # Set the start conditions to the current position of the robot
@@ -58,7 +61,7 @@ class ReactivePlannerController(PlannerControllerBase):
             startCellCoords = self.occupancyGrid.getCellCoordinatesFromWorldCoordinates(start)
 
             print 'Planning a new path: start=' + str(start) + '; goal=' + str(goal)
-            
+
             # Plan a path using the current occupancy grid
             self.gridUpdateLock.acquire()
             pathToGoalFound = self.planner.search(startCellCoords, goalCellCoords)
@@ -69,7 +72,7 @@ class ReactivePlannerController(PlannerControllerBase):
                 rospy.logwarn("Could not find a path to the goal at (%d, %d)", \
                               goalCellCoords[0], goalCellCoords[1])
                 return False
-            
+
             # Extract the path
             self.currentPlannedPath = self.planner.extractPathToGoal()
 
@@ -83,5 +86,3 @@ class ReactivePlannerController(PlannerControllerBase):
             rospy.logerr('goalReached=%d', goalReached)
 
         return goalReached
-            
-            
