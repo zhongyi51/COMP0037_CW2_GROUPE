@@ -230,11 +230,11 @@ class ExplorerNodeBase(object):
             # my note: remove the magical +1 if index out of range error occurs
             width = self.explorer.occupancyGrid.getWidthInCells()
             height = self.explorer.occupancyGrid.getHeightInCells()
-            uncheckedCells = 0
+            checkedCells = 0
             totalCells = width * height
             for x in range(width):
                 for y in range(height):
-                    cell_status = float(self.explorer.occupancyGrid.getCell(x, y))
+                    cell_status = "{0:.1f}".format(self.explorer.occupancyGrid.getCell(x, y)))
                     # print x, y , cell_status # debug del
                     if  cell_status == 1.0 or cell_status == 0.0: # ie. it is un-determined
                         print x, y, cell_status
