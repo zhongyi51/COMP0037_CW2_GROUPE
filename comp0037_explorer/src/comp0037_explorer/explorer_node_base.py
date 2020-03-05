@@ -164,7 +164,7 @@ class ExplorerNodeBase(object):
         velocityPublisher.publish(velocityMessage)
         rospy.sleep(1)
 
-    # my mod: check for the coverage
+    # my mod: check for the coverage. Very bad but simple implementation for now.
     def findCurrentCoverage(self):
         # my note: remove the magical +1 if index out of range error occurs
         width = self.occupancyGrid.getWidthInCells() + 1
@@ -223,6 +223,21 @@ class ExplorerNodeBase(object):
                     self.completed = True
 
                 print 'Thread runtime is: ', rospy.get_time() - self._start_time
+                print 'Thread coverage is: ', self.findCurrentCoverage()
+
+        # my mod: check for the coverage. Very bad but simple implementation for now.
+        def findCurrentCoverage(self):
+            # my note: remove the magical +1 if index out of range error occurs
+            width = self.explorer.occupancyGrid.getWidthInCells() + 1
+            height = self.explorer.occupancyGrid.getHeightInCells() + 1
+            uncheckedCells = 0
+            totalCells = width * height
+            for x in range(width):
+                for y in range():
+                    if self.explorer.occupancyGrid.getCell(x, y) != 1 or self.explorer.occupancyGrid.getCell(x, y) != 0: # ie. it is un-determined
+                        uncheckedCells += 1
+
+            return 1 - uncheckedCells/totalCells
 
     def run(self):
         self._start_time = rospy.get_time()
