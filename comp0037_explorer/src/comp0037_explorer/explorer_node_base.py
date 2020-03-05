@@ -234,7 +234,9 @@ class ExplorerNodeBase(object):
             totalCells = width * height
             for x in range(width):
                 for y in range(height):
-                    if self.explorer.occupancyGrid.getCell(x, y) != 1 or self.explorer.occupancyGrid.getCell(x, y) != 0: # ie. it is un-determined
+                    cell_status = self.explorer.occupancyGrid.getCell(x, y)
+                    print totalCells, cell_status # debug del
+                    if  cell_status != 1 or cell_status != 0: # ie. it is un-determined
                         uncheckedCells += 1
 
             return 1 - uncheckedCells/totalCells
