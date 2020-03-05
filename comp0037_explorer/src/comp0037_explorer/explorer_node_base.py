@@ -50,12 +50,14 @@ class ExplorerNodeBase(object):
         while mapUpdate.initialMapUpdate.isPriorMap is True:
             self.kickstartSimulator()
             mapUpdate = mapRequestService(True)
-            
+
         self.mapUpdateCallback(mapUpdate.initialMapUpdate)
-        
+
+        self._start_time = None # my mod:
+
     def mapUpdateCallback(self, msg):
         rospy.loginfo("map update received")
-        
+
         # If the occupancy grids do not exist, create them
         if self.occupancyGrid is None:
             self.occupancyGrid = OccupancyGrid.fromMapUpdateMessage(msg)
@@ -64,7 +66,7 @@ class ExplorerNodeBase(object):
         # Update the grids
         self.occupancyGrid.updateGridFromVector(msg.occupancyGrid)
         self.deltaOccupancyGrid.updateGridFromVector(msg.deltaOccupancyGrid)
-        
+
         # Update the frontiers
         self.updateFrontiers()
 
@@ -85,7 +87,7 @@ class ExplorerNodeBase(object):
             | self.checkIfCellIsUnknown(x, y, 1, -1) | self.checkIfCellIsUnknown(x, y, 1, 0) \
             | self.checkIfCellIsUnknown(x, y, 1, 1) | self.checkIfCellIsUnknown(x, y, 0, 1) \
             | self.checkIfCellIsUnknown(x, y, -1, 1) | self.checkIfCellIsUnknown(x, y, -1, 0)
-            
+
     def checkIfCellIsUnknown(self, x, y, offsetX, offsetY):
         newX = x + offsetX
         newY = y + offsetY
@@ -111,7 +113,7 @@ class ExplorerNodeBase(object):
 
         # If we don't need to do an update, simply flush the graphics
         # to make sure everything appears properly in VNC
-        
+
         if self.visualisationUpdateRequired is False:
 
             if self.occupancyGridDrawer is not None:
@@ -121,7 +123,7 @@ class ExplorerNodeBase(object):
                 self.deltaOccupancyGridDrawer.flushAndUpdateWindow()
 
             return
-                
+
 
         # Update the visualisation; note that we can only create the
         # drawers here because we don't know the size of the map until
@@ -161,14 +163,36 @@ class ExplorerNodeBase(object):
         velocityMessage = Twist()
         velocityPublisher.publish(velocityMessage)
         rospy.sleep(1)
-            
+
+    # my mod: check for the coverage. Very bad but simple implementation for now.
+    def findCurrentCoverage(self):
+        # my note: remove the magical +1 if index out of range error occurs
+        width = self.occupancyGrid.getWidthInCells()
+        height = self.occupancyGrid.getHeightInCells()
+        checkedCells = 0
+        totalCells = width * height
+        for x in range(width):
+            for y in range(height):
+                cell_status = "{0:.1f}".format(self.occupancyGrid.getCell(x, y)) # expensive fix for the annoying floating point problem, you may want to try to remove the string formating and try comparing the floating points directly to see what will happen, manybe it can work for your case, but for me something annoying happened and I simply used this.
+                if  cell_status == "1.0" or cell_status == "0.0": # ie. it is un-determined
+                    checkedCells += 1
+
+        return 1.0 * checkedCells/totalCells
+
+    def findCurrentRuntime(self):
+        return rospy.get_time() - self._start_time # my mod
+
+    def _printStatus(self):
+        print 'Runtime is: ' + self.findCurrentRuntime()
+        print 'Coverage is: ' + self.findCurrentCoverage()
+
     class ExplorerThread(threading.Thread):
         def __init__(self, explorer):
             threading.Thread.__init__(self)
             self.explorer = explorer
             self.running = False
             self.completed = False;
-
+            self._start_time = rospy.get_time() # my mod:
 
         def isRunning(self):
             return self.running
@@ -185,7 +209,7 @@ class ExplorerNodeBase(object):
                 # Special case. If this is the first time everything
                 # has started, stdr needs a kicking to generate laser
                 # messages. To do this, we get the robot to
-                
+
 
                 # Create a new robot waypoint if required
                 newDestinationAvailable, newDestination = self.explorer.chooseNewDestination()
@@ -198,18 +222,37 @@ class ExplorerNodeBase(object):
                     self.explorer.destinationReached(newDestination, attempt)
                 else:
                     self.completed = True
-                    
-       
-    def run(self):
 
+                print 'Thread runtime is: ', rospy.get_time() - self._start_time
+                print 'Thread coverage is: ', self.findCurrentCoverage()
+
+        # my mod: check for the coverage. Very bad but simple implementation for now. It scans through the whole map to check for if cells are visited.
+        def findCurrentCoverage(self):
+            # my note: remove the magical +1 if index out of range error occurs
+            width = self.explorer.occupancyGrid.getWidthInCells()
+            height = self.explorer.occupancyGrid.getHeightInCells()
+            checkedCells = 0
+            totalCells = width * height
+            for x in range(width):
+                for y in range(height):
+                    cell_status = "{0:.1f}".format(self.explorer.occupancyGrid.getCell(x, y)) # it is for the annoying floating point problem, you may want to try to remove the string formating and try comparing the floating points directly to see what will happen, manybe it can work for your case, but for me somthing annoying happened and I simply fixed it by this.
+                    # print x, y , cell_status # debug del
+                    if  cell_status == "1.0" or cell_status == "0.0": # ie. it is un-determined
+                        # print x, y, cell_status # debug del
+                        checkedCells += 1
+
+            return 1.0 * checkedCells/totalCells
+
+    def run(self):
+        self._start_time = rospy.get_time()
         explorerThread = ExplorerNodeBase.ExplorerThread(self)
 
         keepRunning = True
-        
+
         while (rospy.is_shutdown() is False) & (keepRunning is True):
 
             rospy.sleep(0.1)
-            
+
             self.updateVisualisation()
 
             if self.occupancyGrid is None:
@@ -222,5 +265,5 @@ class ExplorerNodeBase(object):
                 explorerThread.join()
                 keepRunning = False
 
-            
-            
+        print 'Exploration completed, now printing status' # debug del
+        self._printStatus()

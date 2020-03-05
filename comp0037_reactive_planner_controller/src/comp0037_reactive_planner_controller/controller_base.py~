@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import rospy
+import rospy， time, math, os
 from geometry_msgs.msg  import Twist
 from geometry_msgs.msg  import Pose2D
 from std_msgs.msg import String
@@ -8,9 +8,13 @@ from math import pow,atan2,sqrt,pi
 from planned_path import PlannedPath
 import time
 import math
+from subprocess import Popen, call
+from datetime import datetime
 
-# This is the base class of the controller which moves the robot to its goal.
-# could do.
+# for saving the travelling summary infomation for analysis
+call("[ ! -d {0} ] &&  mkdir {0}".format('/home/ros_user/datasave_assignment2/'), shell=True)
+DRIVE_TO_GOAL_STATUS_SUMMARY_SAVEFILE = '/home/ros_user/datasave_assignment2/AstarByMD_Factory_Terrain_Summary_{}.txt'.format(time.strftime("%Y%m%d-%H%M%S"))
+NORMVAL = 4.55 # normalize the travel cost, which is diff from the distance
 
 class ControllerBase(object):
 
@@ -42,6 +46,9 @@ class ControllerBase(object):
         # This flag says if the current goal should be aborted
         self.abortCurrentGoal = False
 
+        # my mod:
+        record = ControllerRecord()
+
 
     # Get the pose of the robot. Store this in a Pose2D structure because
     # this is easy to use. Use radians for angles because these are used
@@ -58,6 +65,9 @@ class ControllerBase(object):
         pose.y = position.y
         pose.theta = 2 * atan2(orientation.z, orientation.w)
         self.pose = pose
+
+        record.updateRecord(pose)
+        record.printRecord()
 
     # Return the most up-to-date pose of the robot
     def getCurrentPose(self):
@@ -87,9 +97,10 @@ class ControllerBase(object):
         self.abortCurrentGoal = False
         self.plannerDrawer = plannerDrawer
 
-        rospy.loginfo('Driving path to goal with ' + str(len(path.waypoints)) + ' waypoint(s)')
+        goal = str(path.waypoints[-1].coords) # myMod: assume last waypoints is the goal. DEBUG: can consider to del
+        rospy.loginfo('Driving path to goal cell %s with '%goal + str(len(path.waypoints)) + ' waypoint(s)')
 
-        # Drive to each waypoint in turn
+        self.reset() # myMod: clean up the pre-setup status errors
         for waypointNumber in range(0, len(path.waypoints)):
             cell = path.waypoints[waypointNumber]
             waypoint = self.occupancyGrid.getWorldCoordinatesFromCellCoordinates(cell.coords)
