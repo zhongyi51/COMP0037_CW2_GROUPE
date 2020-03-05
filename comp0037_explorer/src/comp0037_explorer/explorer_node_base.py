@@ -169,14 +169,15 @@ class ExplorerNodeBase(object):
         # my note: remove the magical +1 if index out of range error occurs
         width = self.occupancyGrid.getWidthInCells()
         height = self.occupancyGrid.getHeightInCells()
-        uncheckedCells = 0
+        checkedCells = 0
         totalCells = width * height
         for x in range(width):
             for y in range(height):
-                if self.occupancyGrid.getCell(x, y) != 1 or self.occupancyGrid.getCell(x, y) != 0: # ie. it is un-determined
-                    uncheckedCells += 1
+                cell_status = "{0:.1f}".format(self.occupancyGrid.getCell(x, y)) # it is for the annoying floating point problem, you may want to try to remove the string formating and try comparing the floating points directly to see what will happen, manybe it can work for your case, but for me somthing annoying happened and I simply fixed it by this.
+                if  cell_status == "1.0" or cell_status == "0.0": # ie. it is un-determined
+                    checkedCells += 1
 
-        return 1 - uncheckedCells/totalCells
+        return checkedCells/totalCells
 
     def findCurrentRuntime(self):
         return rospy.get_time() - self._start_time # my mod
@@ -237,7 +238,7 @@ class ExplorerNodeBase(object):
                     cell_status = "{0:.1f}".format(self.explorer.occupancyGrid.getCell(x, y)) # it is for the annoying floating point problem, you may want to try to remove the string formating and try comparing the floating points directly to see what will happen, manybe it can work for your case, but for me somthing annoying happened and I simply fixed it by this.
                     # print x, y , cell_status # debug del
                     if  cell_status == "1.0" or cell_status == "0.0": # ie. it is un-determined
-                        # print x, y, cell_status # debug del
+                        print x, y, cell_status # debug del
                         checkedCells += 1
 
             return checkedCells/totalCells
