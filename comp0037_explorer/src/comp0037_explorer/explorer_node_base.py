@@ -191,7 +191,7 @@ class ExplorerNodeBase(object):
             self.explorer = explorer
             self.running = False
             self.completed = False;
-            self._start_time = None # my mod:
+            self._start_time = rospy.get_time() # my mod:
 
         def isRunning(self):
             return self.running
