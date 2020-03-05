@@ -241,7 +241,7 @@ class ExplorerNodeBase(object):
                         print x, y, cell_status # debug del
                         checkedCells += 1
 
-            return checkedCells/totalCells
+            return float(checkedCells/totalCells)
 
     def run(self):
         self._start_time = rospy.get_time()
