@@ -235,11 +235,12 @@ class ExplorerNodeBase(object):
             for x in range(width):
                 for y in range(height):
                     cell_status = float(self.explorer.occupancyGrid.getCell(x, y))
-                    print x, y , cell_status # debug del
-                    if  cell_status != 1.0 or cell_status != 0.0: # ie. it is un-determined
-                        uncheckedCells += 1
+                    # print x, y , cell_status # debug del
+                    if  cell_status == 1.0 or cell_status == 0.0: # ie. it is un-determined
+                        print x, y, cell_status
+                        checkedCells += 1
 
-            return 1 - uncheckedCells/totalCells
+            return uncheckedCells/totalCells
 
     def run(self):
         self._start_time = rospy.get_time()
