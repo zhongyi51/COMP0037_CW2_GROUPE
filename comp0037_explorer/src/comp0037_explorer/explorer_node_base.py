@@ -225,7 +225,7 @@ class ExplorerNodeBase(object):
                 print 'Thread runtime is: ', rospy.get_time() - self._start_time
                 print 'Thread coverage is: ', self.findCurrentCoverage()
 
-        # my mod: check for the coverage. Very bad but simple implementation for now.
+        # my mod: check for the coverage. Very bad but simple implementation for now. It scans through the whole map to check for if cells are visited.
         def findCurrentCoverage(self):
             # my note: remove the magical +1 if index out of range error occurs
             width = self.explorer.occupancyGrid.getWidthInCells()
@@ -234,8 +234,8 @@ class ExplorerNodeBase(object):
             totalCells = width * height
             for x in range(width):
                 for y in range(height):
-                    cell_status = self.explorer.occupancyGrid.getCell(x, y)
-                    # print x, y , cell_status # debug del
+                    cell_status = float(self.explorer.occupancyGrid.getCell(x, y))
+                    print x, y , cell_status # debug del
                     if  cell_status != 1. or cell_status != 0.: # ie. it is un-determined
                         uncheckedCells += 1
 
