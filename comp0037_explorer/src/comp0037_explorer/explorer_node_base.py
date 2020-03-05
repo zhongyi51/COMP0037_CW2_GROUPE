@@ -221,8 +221,8 @@ class ExplorerNodeBase(object):
                     self.explorer.destinationReached(newDestination, attempt)
                 else:
                     self.completed = True
-                    print 'Thread runtime is: ', rospy.get_time() - self._start_time
 
+                print 'Thread runtime is: ', rospy.get_time() - self._start_time
 
     def run(self):
         self._start_time = rospy.get_time()
