@@ -172,7 +172,7 @@ class ExplorerNodeBase(object):
         uncheckedCells = 0
         totalCells = width * height
         for x in range(width):
-            for y in range():
+            for y in range(height):
                 if self.occupancyGrid.getCell(x, y) != 1 or self.occupancyGrid.getCell(x, y) != 0: # ie. it is un-determined
                     uncheckedCells += 1
 
@@ -233,7 +233,7 @@ class ExplorerNodeBase(object):
             uncheckedCells = 0
             totalCells = width * height
             for x in range(width):
-                for y in range():
+                for y in range(height):
                     if self.explorer.occupancyGrid.getCell(x, y) != 1 or self.explorer.occupancyGrid.getCell(x, y) != 0: # ie. it is un-determined
                         uncheckedCells += 1
 
