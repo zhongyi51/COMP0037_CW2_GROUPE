@@ -167,8 +167,8 @@ class ExplorerNodeBase(object):
     # my mod: check for the coverage. Very bad but simple implementation for now.
     def findCurrentCoverage(self):
         # my note: remove the magical +1 if index out of range error occurs
-        width = self.occupancyGrid.getWidthInCells() + 1
-        height = self.occupancyGrid.getHeightInCells() + 1
+        width = self.occupancyGrid.getWidthInCells()
+        height = self.occupancyGrid.getHeightInCells()
         uncheckedCells = 0
         totalCells = width * height
         for x in range(width):
@@ -228,8 +228,8 @@ class ExplorerNodeBase(object):
         # my mod: check for the coverage. Very bad but simple implementation for now.
         def findCurrentCoverage(self):
             # my note: remove the magical +1 if index out of range error occurs
-            width = self.explorer.occupancyGrid.getWidthInCells() + 1
-            height = self.explorer.occupancyGrid.getHeightInCells() + 1
+            width = self.explorer.occupancyGrid.getWidthInCells()
+            height = self.explorer.occupancyGrid.getHeightInCells()
             uncheckedCells = 0
             totalCells = width * height
             for x in range(width):
