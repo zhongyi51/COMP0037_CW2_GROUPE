@@ -40,11 +40,12 @@ class ReactivePlannerController(PlannerControllerBase):
         # waypoints are in self.currentPlannedPath, can still be
         # traversed
 
+        # my mod: check through the waypoints on the current planned path, to see if any one is blocked from the perceptions of robot
         for wp in self.currentPlannedPath.waypoints:
             x,y = wp.coords
             status = self.occupancyGrid.getCell(x,y)
             if status == BLOCKED: # check status from the continuously updating occupancy grid
-                print x,y, 'status = ', status, 'Now stop and replan'
+                print 'coords = ', x, y, 'status = ', status, 'Now stop and replan' # debug del
                 self.controller.stopDrivingToCurrentGoal() # stop the robot
                 break
 
