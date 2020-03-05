@@ -238,7 +238,7 @@ class ExplorerNodeBase(object):
                     cell_status = "{0:.1f}".format(self.explorer.occupancyGrid.getCell(x, y)) # it is for the annoying floating point problem, you may want to try to remove the string formating and try comparing the floating points directly to see what will happen, manybe it can work for your case, but for me somthing annoying happened and I simply fixed it by this.
                     # print x, y , cell_status # debug del
                     if  cell_status == "1.0" or cell_status == "0.0": # ie. it is un-determined
-                        print x, y, cell_status # debug del
+                        # print x, y, cell_status # debug del
                         checkedCells += 1
 
             return float(checkedCells/totalCells)
