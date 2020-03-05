@@ -12,11 +12,10 @@ class ExplorerNode(ExplorerNodeBase):
 
         self.blackList = []
 
-    def updateFrontiers(self):
+    def updateFrontiers(self): # TODO: implement this !!!
         pass
 
     def chooseNewDestination(self):
-
 
 #         print 'blackList:'
 #         for coords in self.blackList:
@@ -35,7 +34,7 @@ class ExplorerNode(ExplorerNodeBase):
                         if self.blackList[k] == candidate:
                             candidateGood = False
                             break
-                    
+
                     if candidateGood is True:
                         d2 = candidate[0]**2+(candidate[1]-0.5*self.occupancyGrid.getHeightInCells())**2
 
@@ -51,4 +50,3 @@ class ExplorerNode(ExplorerNodeBase):
         if goalReached is False:
 #             print 'Adding ' + str(goal) + ' to the naughty step'
             self.blackList.append(goal)
-            
