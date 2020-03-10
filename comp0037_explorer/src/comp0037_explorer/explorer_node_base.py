@@ -184,7 +184,7 @@ class ExplorerNodeBase(object):
 
     def _printStatus(self):
         print 'Runtime is: ' + self.findCurrentRuntime()
-        print 'Coverage is: ' + self._findCurrentCoverage()
+        print 'Discoverage is: ' + self._findCurrentCoverage()
 
     class ExplorerThread(threading.Thread):
         def __init__(self, explorer):
@@ -232,11 +232,11 @@ class ExplorerNodeBase(object):
         def _update_and_print_thread_info(self):
             cur_time = rospy.get_time()
             cur_coverage = self._findCurrentCoverage()
-            print 'Thread runtime is: ',  cur_time - self._start_time
-            print 'Thread Time used is: ', cur_time - self._pre_time
-            print 'Thread coverage is: ', cur_coverage
-            print 'Thread coverage diff is: ', cur_coverage - self._pre_coverage
-            print 'Thread (coverage diff)/(time diff) is:', 1.0*(cur_coverage - self._pre_coverage)/(cur_time - self._pre_time)
+            print 'Thread Runtime is: ',  cur_time - self._start_time
+            print 'Thread Time is: ', cur_time - self._pre_time
+            print 'Thread Discoverage is: ', cur_coverage
+            print 'Thread Discoverage Diff is: ', cur_coverage - self._pre_coverage
+            print 'Thread (Discoverage Diff)/(Time Diff) is:', 1.0*(cur_coverage - self._pre_coverage)/(cur_time - self._pre_time)
             self._pre_time, self._pre_coverage = cur_time, cur_coverage
 
         # my mod: check for the coverage. Very bad but simple implementation for now. It scans through the whole map to check for if cells are visited.
