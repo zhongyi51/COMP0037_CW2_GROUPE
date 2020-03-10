@@ -240,7 +240,7 @@ class ExplorerNodeBase(object):
             self._pre_time, self._pre_coverage = cur_time, cur_coverage
 
         # my mod: check for the coverage. Very bad but simple implementation for now. It scans through the whole map to check for if cells are visited.
-        def __findCurrentCoverage(self):
+        def _findCurrentCoverage(self):
             # my note: remove the magical +1 if index out of range error occurs
             width = self.explorer.occupancyGrid.getWidthInCells()
             height = self.explorer.occupancyGrid.getHeightInCells()
