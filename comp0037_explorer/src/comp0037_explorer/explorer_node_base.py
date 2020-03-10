@@ -165,7 +165,7 @@ class ExplorerNodeBase(object):
         rospy.sleep(1)
 
     # my mod: check for the coverage. Very bad but simple implementation for now.
-    def findCurrentCoverage(self):
+    def _findCurrentCoverage(self):
         # my note: remove the magical +1 if index out of range error occurs
         width = self.occupancyGrid.getWidthInCells()
         height = self.occupancyGrid.getHeightInCells()
@@ -184,7 +184,7 @@ class ExplorerNodeBase(object):
 
     def _printStatus(self):
         print 'Runtime is: ' + self.findCurrentRuntime()
-        print 'Coverage is: ' + self.findCurrentCoverage()
+        print 'Coverage is: ' + self._findCurrentCoverage()
 
     class ExplorerThread(threading.Thread):
         def __init__(self, explorer):
@@ -192,7 +192,11 @@ class ExplorerNodeBase(object):
             self.explorer = explorer
             self.running = False
             self.completed = False;
-            self._start_time = rospy.get_time() # my mod:
+
+            # my mod:
+            self._start_time = rospy.get_time()
+            self._pre_time = rospy.get_time()
+            self._pre_coverage = 0
 
         def isRunning(self):
             return self.running
@@ -223,11 +227,20 @@ class ExplorerNodeBase(object):
                 else:
                     self.completed = True
 
-                print 'Thread runtime is: ', rospy.get_time() - self._start_time
-                print 'Thread coverage is: ', self.findCurrentCoverage()
+                self._update_and_print_thread_info() # my mod: for analysising data
+
+        def _update_and_print_thread_info(self):
+            cur_time = rospy.get_time()
+            cur_coverage = self._findCurrentCoverage()
+            print 'Thread runtime is: ',  cur_time - self._start_time,
+            print 'Thread Time used is: ', cur_time - self._pre_time
+            print 'Thread coverage is: ', cur_coverage
+            print 'Thread coverage diff is: ', cur_coverage - self._pre_coverage
+            print 'Thread (coverage diff)/(time diff) is:', 1.0*(cur_coverage - self._pre_coverage)/(cur_time - self._pre_time)
+            self._pre_time, self._pre_coverage = cur_time, cur_coverage
 
         # my mod: check for the coverage. Very bad but simple implementation for now. It scans through the whole map to check for if cells are visited.
-        def findCurrentCoverage(self):
+        def __findCurrentCoverage(self):
             # my note: remove the magical +1 if index out of range error occurs
             width = self.explorer.occupancyGrid.getWidthInCells()
             height = self.explorer.occupancyGrid.getHeightInCells()
@@ -236,9 +249,7 @@ class ExplorerNodeBase(object):
             for x in range(width):
                 for y in range(height):
                     cell_status = "{0:.1f}".format(self.explorer.occupancyGrid.getCell(x, y)) # it is for the annoying floating point problem, you may want to try to remove the string formating and try comparing the floating points directly to see what will happen, manybe it can work for your case, but for me somthing annoying happened and I simply fixed it by this.
-                    # print x, y , cell_status # debug del
                     if  cell_status == "1.0" or cell_status == "0.0": # ie. it is un-determined
-                        # print x, y, cell_status # debug del
                         checkedCells += 1
 
             return 1.0 * checkedCells/totalCells

@@ -8,6 +8,7 @@ from explorer_node_base import ExplorerNodeBase
 class ExplorerNode(ExplorerNodeBase):
 
     def __init__(self):
+        print "I am explorer_node_closest.py" # debug del
 
         self.blackList = []
         self.frontierList=[]
@@ -23,7 +24,7 @@ class ExplorerNode(ExplorerNodeBase):
                 if self.isFrontierCell(x, y) is True and candidate not in self.blackList:
                     new_frontierList.append(candidate)
 
-        #print "The frontierList is:"+str(self.frontierList)
+        print "The frontierList is:"+str(self.frontierList) # debug del
 
         if len(new_frontierList)!=0:
             self.frontierList=new_frontierList[:]
