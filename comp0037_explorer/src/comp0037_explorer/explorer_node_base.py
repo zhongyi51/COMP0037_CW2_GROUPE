@@ -232,7 +232,7 @@ class ExplorerNodeBase(object):
         def _update_and_print_thread_info(self):
             cur_time = rospy.get_time()
             cur_coverage = self._findCurrentCoverage()
-            print 'Thread runtime is: ',  cur_time - self._start_time,
+            print 'Thread runtime is: ',  cur_time - self._start_time
             print 'Thread Time used is: ', cur_time - self._pre_time
             print 'Thread coverage is: ', cur_coverage
             print 'Thread coverage diff is: ', cur_coverage - self._pre_coverage
