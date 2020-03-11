@@ -1,7 +1,6 @@
 import rospy
 import threading
 import math
-from time import strftime
 
 from comp0037_mapper.msg import *
 from comp0037_mapper.srv import *
@@ -10,6 +9,10 @@ from comp0037_reactive_planner_controller.occupancy_grid import OccupancyGrid
 from comp0037_reactive_planner_controller.grid_drawer import OccupancyGridDrawer
 from geometry_msgs.msg  import Twist
 
+from time import strftime
+from subprocess import Popen, call
+
+call("[ ! -d {0} ] &&  mkdir {0}".format('/home/ros_user/Desktop/data_cw2/'), shell=True)
 FILETO = "/home/ros_user/Desktop/data_cw2/task22_{}.txt".format(strftime("%m%d_%H%M%S"))
 
 class ExplorerNodeBase(object):
