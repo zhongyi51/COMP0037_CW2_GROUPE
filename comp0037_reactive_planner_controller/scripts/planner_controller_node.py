@@ -76,7 +76,7 @@ class PlannerControllerNode(object):
         self.plannerController.handleMapUpdateMessage(msg)
 
     def createPlanner(self):
-        self.planner = AStarByMDPlanner('a_star_by_euclidean_distance', self.occupancyGrid)
+        self.planner = AStarByEDPlanner('a_star_by_euclidean_distance', self.occupancyGrid)
         self.planner.setPauseTime(0)
         self.planner.windowHeightInPixels = rospy.get_param('maximum_window_height_in_pixels', 700)
 
