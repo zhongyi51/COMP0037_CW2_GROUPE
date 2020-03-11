@@ -10,7 +10,7 @@ from comp0037_reactive_planner_controller.occupancy_grid import OccupancyGrid
 from comp0037_reactive_planner_controller.grid_drawer import OccupancyGridDrawer
 from geometry_msgs.msg  import Twist
 
-FILETO = "/home/ros_user/Desktop/data_cw2/task_2_2_{}.txt".format(strftime("m%d_%H%M%S"))
+FILETO = "/home/ros_user/Desktop/data_cw2/task_2_2_{}.txt".format(strftime("%m%d_%H%M%S"))
 
 class ExplorerNodeBase(object):
 
@@ -205,7 +205,7 @@ class ExplorerNodeBase(object):
             # my mod:
             self._start_time = rospy.get_time()
             self._pre_time = rospy.get_time()
-            self._pre_coverage = 0
+            self._pre_coverage = 0.0
 
         def isRunning(self):
             return self.running
@@ -243,11 +243,12 @@ class ExplorerNodeBase(object):
             cur_coverage = self._findCurrentDiscoverage()
             fp = open(FILETO, 'a+')
             print >> fp, 'Thread Runtime is: ',  cur_time - self._start_time
-            print >> fp, 'Thread Time is: ', cur_time - self._pre_time
+            print >> fp, 'Thread Time Diff is: ', cur_time - self._pre_time
             print >> fp, 'Thread Discoverage is: ', cur_coverage * 100
+            print >> fp, 'Thread debug: ', cur_coverage, self._pre_coverage
             print >> fp, 'Thread Discoverage Diff is: ', (cur_coverage - self._pre_coverage) * 100
-            print >> fp, 'Thread Speed of Discoverage is:', 1.0*(cur_coverage - self._pre_coverage)/(cur_time - self._pre_time)
-            print
+            print >> fp, 'Thread Speed of Discoverage is:', (cur_coverage - self._pre_coverage)/(cur_time - self._pre_time)
+            print >> fp
             fp.close()
             self._pre_time, self._pre_coverage = cur_time, cur_coverage
 
