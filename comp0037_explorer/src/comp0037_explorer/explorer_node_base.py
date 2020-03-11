@@ -1,6 +1,7 @@
 import rospy
 import threading
 import math
+from time import time
 
 from comp0037_mapper.msg import *
 from comp0037_mapper.srv import *
@@ -8,6 +9,8 @@ from comp0037_reactive_planner_controller.srv import *
 from comp0037_reactive_planner_controller.occupancy_grid import OccupancyGrid
 from comp0037_reactive_planner_controller.grid_drawer import OccupancyGridDrawer
 from geometry_msgs.msg  import Twist
+
+FILETO = "/home/ros_user/Desktop/data_cw2/task_2_2_{}.txt".format(strftime("m%d_%H%M%S"))
 
 class ExplorerNodeBase(object):
 
@@ -183,10 +186,13 @@ class ExplorerNodeBase(object):
         return rospy.get_time() - self._start_time # my mod
 
     def _printStatus(self):
+        fp = open(FILETO, 'a+')
+        print >> fp, 'Exploration completed, now printing status' # debug del
         total_time, discoveage = self._findCurrentRuntime(), self._findCurrentDiscoverage()
-        print 'Runtime is: ', total_time
-        print 'Discoverage is: ', discoveage
-        print 'Discoverage rate is: ', discoveage/total_time
+        print >> fp, 'Runtime is: ', total_time
+        print >> fp, 'Discoverage is: ', discoveage
+        print >> fp, 'Discoverage rate is: ', discoveage/total_time
+        fp.close()
 
 
     class ExplorerThread(threading.Thread):
@@ -235,11 +241,13 @@ class ExplorerNodeBase(object):
         def _update_and_print_thread_info(self):
             cur_time = rospy.get_time()
             cur_coverage = self._findCurrentDiscoverage()
-            print 'Thread Runtime is: ',  cur_time - self._start_time
-            print 'Thread Time is: ', cur_time - self._pre_time
-            print 'Thread Discoverage is: ', cur_coverage * 100
-            print 'Thread Discoverage Diff is: ', (cur_coverage - self._pre_coverage) * 100
-            print 'Thread Speed of Discoverage is:', 1.0*(cur_coverage - self._pre_coverage)/(cur_time - self._pre_time)
+            fp = open(FILETO, 'a+')
+            print >> fp, 'Thread Runtime is: ',  cur_time - self._start_time
+            print >> fp, 'Thread Time is: ', cur_time - self._pre_time
+            print >> fp, 'Thread Discoverage is: ', cur_coverage * 100
+            print >> fp, 'Thread Discoverage Diff is: ', (cur_coverage - self._pre_coverage) * 100
+            print >> fp, 'Thread Speed of Discoverage is:', 1.0*(cur_coverage - self._pre_coverage)/(cur_time - self._pre_time)
+            fp.close()
             self._pre_time, self._pre_coverage = cur_time, cur_coverage
 
         # my mod: check for the coverage. Very bad but simple implementation for now. It scans through the whole map to check for if cells are visited.
@@ -279,5 +287,4 @@ class ExplorerNodeBase(object):
                 explorerThread.join()
                 keepRunning = False
 
-        print 'Exploration completed, now printing status' # debug del
         self._printStatus()
