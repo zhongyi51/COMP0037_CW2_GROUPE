@@ -2,7 +2,7 @@
 
 # Import the needed types.
 from comp0037_reactive_planner_controller.occupancy_grid import OccupancyGrid
-from comp0037_reactive_planner_controller.a_star_by_euclidean_distance import AStarByEDPlanner
+from comp0037_reactive_planner_controller.a_star_by_ED_planner import AStarByEDPlanner
 
 # Create the occupancy grid. Syntax is: number of cells in X, number of cells in Y,
 # length of each cell in m
