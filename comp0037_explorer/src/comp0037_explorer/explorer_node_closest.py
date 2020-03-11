@@ -24,7 +24,7 @@ class ExplorerNode(ExplorerNodeBase):
                 if self.isFrontierCell(x, y) is True and candidate not in self.blackList:
                     new_frontierList.append(candidate)
 
-        print "The frontierList is:"+str(self.frontierList) # debug del
+        # print "The frontierList is:"+str(self.frontierList) # debug del
 
         if len(new_frontierList)!=0:
             self.frontierList=new_frontierList[:]
