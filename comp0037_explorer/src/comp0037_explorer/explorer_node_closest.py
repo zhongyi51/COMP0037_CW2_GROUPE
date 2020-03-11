@@ -32,9 +32,6 @@ class ExplorerNode(ExplorerNodeBase):
 
         return False
 
-
-
-
     def chooseNewDestination(self):
 
 #         print 'blackList:'
@@ -42,11 +39,9 @@ class ExplorerNode(ExplorerNodeBase):
 #             print str(coords)
 
         if self.updateFrontiers()==True:
-
             minD=99999
             minCell=[0,0]
             print "Current position:"+str(self.coordinates)
-
 
             for i in self.frontierList:
                 deltaD=(i[0]-self.coordinates[0])**2+(i[1]-self.coordinates[1])**2
@@ -57,7 +52,6 @@ class ExplorerNode(ExplorerNodeBase):
             return True,minCell
 
         return False,None
-
 
     def destinationReached(self, goal, goalReached):
         if goalReached is False:
