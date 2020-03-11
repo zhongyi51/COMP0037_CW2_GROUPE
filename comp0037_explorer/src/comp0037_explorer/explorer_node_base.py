@@ -165,7 +165,7 @@ class ExplorerNodeBase(object):
         rospy.sleep(1)
 
     # my mod: check for the coverage. Very bad but simple implementation for now.
-    def _findCurrentCoverage(self):
+    def _findCurrentDiscoverage(self):
         # my note: remove the magical +1 if index out of range error occurs
         width = self.occupancyGrid.getWidthInCells()
         height = self.occupancyGrid.getHeightInCells()
@@ -179,12 +179,15 @@ class ExplorerNodeBase(object):
 
         return 1.0 * checkedCells/totalCells
 
-    def findCurrentRuntime(self):
+    def _findCurrentRuntime(self):
         return rospy.get_time() - self._start_time # my mod
 
     def _printStatus(self):
-        print 'Runtime is: ' + self.findCurrentRuntime()
-        print 'Discoverage is: ' + self._findCurrentCoverage()
+        total_time, discoveage = self._findCurrentRuntime(), self._findCurrentDiscoverage()
+        print 'Runtime is: ', total_time
+        print 'Discoverage is: ', discoveage
+        print 'Discoverage rate is: ', discoveage/total_time
+
 
     class ExplorerThread(threading.Thread):
         def __init__(self, explorer):
@@ -231,16 +234,16 @@ class ExplorerNodeBase(object):
 
         def _update_and_print_thread_info(self):
             cur_time = rospy.get_time()
-            cur_coverage = self._findCurrentCoverage()
+            cur_coverage = self._findCurrentDiscoverage()
             print 'Thread Runtime is: ',  cur_time - self._start_time
             print 'Thread Time is: ', cur_time - self._pre_time
-            print 'Thread Discoverage is: ', cur_coverage
-            print 'Thread Discoverage Diff is: ', cur_coverage - self._pre_coverage
-            print 'Thread (Discoverage Diff)/(Time Diff) is:', 1.0*(cur_coverage - self._pre_coverage)/(cur_time - self._pre_time)
+            print 'Thread Discoverage is: ', cur_coverage * 100
+            print 'Thread Discoverage Diff is: ', (cur_coverage - self._pre_coverage) * 100
+            print 'Thread Speed of Discoverage is:', 1.0*(cur_coverage - self._pre_coverage)/(cur_time - self._pre_time)
             self._pre_time, self._pre_coverage = cur_time, cur_coverage
 
         # my mod: check for the coverage. Very bad but simple implementation for now. It scans through the whole map to check for if cells are visited.
-        def _findCurrentCoverage(self):
+        def _findCurrentDiscoverage(self):
             # my note: remove the magical +1 if index out of range error occurs
             width = self.explorer.occupancyGrid.getWidthInCells()
             height = self.explorer.occupancyGrid.getHeightInCells()
