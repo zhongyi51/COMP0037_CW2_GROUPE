@@ -8,9 +8,10 @@ from explorer_node_base import ExplorerNodeBase
 class ExplorerNode(ExplorerNodeBase):
 
     def __init__(self):
+        print "I am explorer_node_closest.py" # debug del
 
         self.blackList = []
-	self.frontierList=[]
+        self.frontierList=[]
         self.coordinates=[0,0]
 
         ExplorerNodeBase.__init__(self)
@@ -22,41 +23,35 @@ class ExplorerNode(ExplorerNodeBase):
                 candidate=(x,y)
                 if self.isFrontierCell(x, y) is True and candidate not in self.blackList:
                     new_frontierList.append(candidate)
-        
-        #print "The frontierList is:"+str(self.frontierList)
+
+        # print "The frontierList is:"+str(self.frontierList) # debug del
 
         if len(new_frontierList)!=0:
             self.frontierList=new_frontierList[:]
             return True
 
         return False
-                
-	
-
 
     def chooseNewDestination(self):
 
 #         print 'blackList:'
 #         for coords in self.blackList:
 #             print str(coords)
-        
+
         if self.updateFrontiers()==True:
-        
             minD=99999
             minCell=[0,0]
             print "Current position:"+str(self.coordinates)
 
-            
             for i in self.frontierList:
                 deltaD=(i[0]-self.coordinates[0])**2+(i[1]-self.coordinates[1])**2
                 if deltaD<minD:
                     minD=deltaD
                     minCell=i
-            
+
             return True,minCell
-            
+
         return False,None
-    
 
     def destinationReached(self, goal, goalReached):
         if goalReached is False:

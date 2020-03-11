@@ -25,6 +25,8 @@ from comp0037_reactive_planner_controller.occupancy_grid import OccupancyGrid
 from comp0037_reactive_planner_controller.passive_planner_controller import PassivePlannerController
 from comp0037_reactive_planner_controller.reactive_planner_controller import ReactivePlannerController
 from comp0037_reactive_planner_controller.dijkstra_planner import DijkstraPlanner
+from comp0037_reactive_planner_controller.astar_by_ED_planner import AStarByEDPlanner
+from comp0037_reactive_planner_controller.astar_by_MD_planner import AStarByMDPlanner
 from comp0037_reactive_planner_controller.move2goal_controller import Move2GoalController
 
 # This class is the main node and orchestrates everything else
@@ -37,7 +39,7 @@ class PlannerControllerNode(object):
         self.waitForDriveCompleted =  threading.Condition()
         self.goal = None
         self.goalReached = False
-    
+
     def createOccupancyGridFromMapServer(self):
 
         # If we are using the ground truth map, get it directly from stdr. Otherwise,
@@ -50,15 +52,15 @@ class PlannerControllerNode(object):
 
         # Get the map service
         rospy.loginfo('Waiting for static_map to become available.')
-        rospy.wait_for_service('static_map') 
+        rospy.wait_for_service('static_map')
         self.mapServer = rospy.ServiceProxy('static_map', GetMap)
         rospy.loginfo('Found static_map; requesting map data')
-            
+
         # Query the map status
         response = self.mapServer()
         map = response.map
         rospy.loginfo('Got map data')
-            
+
         # Allocate the occupancy grid and set the data from the array sent back by the map server
         self.occupancyGrid = OccupancyGrid(map.info.width, map.info.height, map.info.resolution)
         self.occupancyGrid.setScale(rospy.get_param('plan_scale', 5))
@@ -72,15 +74,15 @@ class PlannerControllerNode(object):
     def mapUpdateCallback(self, msg):
         rospy.loginfo("******************************** map update received")
         self.plannerController.handleMapUpdateMessage(msg)
-        
+
     def createPlanner(self):
-        self.planner = DijkstraPlanner('Dijkstra', self.occupancyGrid)
+        self.planner = AStarByEDPlanner('a_star_by_euclidean_distance', self.occupancyGrid)
         self.planner.setPauseTime(0)
         self.planner.windowHeightInPixels = rospy.get_param('maximum_window_height_in_pixels', 700)
 
         removeGoalCellFromPathIfOccupied = rospy.get_param('remove_goal_cell_from_path_if_occupied', False)
         self.planner.setRemoveGoalCellFromPathIfOccupied(removeGoalCellFromPathIfOccupied)
-        
+
     def createRobotController(self):
         self.robotController = Move2GoalController(self.occupancyGrid)
 
@@ -103,7 +105,7 @@ class PlannerControllerNode(object):
         self.waitForDriveCompleted.release()
 
         return GoalResponse(self.goalReached)
-    
+
     def run(self):
 
         # First set up the occupancy grid
@@ -111,7 +113,7 @@ class PlannerControllerNode(object):
 
         # Create the planner
         self.createPlanner()
-        
+
         # Set up the robot controller
         self.createRobotController()
 
@@ -126,7 +128,7 @@ class PlannerControllerNode(object):
         service = rospy.Service('drive_to_goal', Goal, self.handleDriveToGoal)
 
         rospy.loginfo('Spinning to service goal requests')
-        
+
         while not rospy.is_shutdown():
 
             # Wait for a new goal. Allow at most 0.1s, which gives
