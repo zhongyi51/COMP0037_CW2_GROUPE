@@ -26,6 +26,7 @@ from comp0037_reactive_planner_controller.passive_planner_controller import Pass
 from comp0037_reactive_planner_controller.reactive_planner_controller import ReactivePlannerController
 from comp0037_reactive_planner_controller.dijkstra_planner import DijkstraPlanner
 from comp0037_reactive_planner_controller.astar_by_ED_planner import AStarByEDPlanner
+from comp0037_reactive_planner_controller.astar_by_MD_planner import AStarByMDPlanner
 from comp0037_reactive_planner_controller.move2goal_controller import Move2GoalController
 
 # This class is the main node and orchestrates everything else
@@ -75,7 +76,7 @@ class PlannerControllerNode(object):
         self.plannerController.handleMapUpdateMessage(msg)
 
     def createPlanner(self):
-        self.planner = AStarByEDPlanner('a_star_by_euclidean_distance', self.occupancyGrid)
+        self.planner = AStarByMDPlanner('a_star_by_euclidean_distance', self.occupancyGrid)
         self.planner.setPauseTime(0)
         self.planner.windowHeightInPixels = rospy.get_param('maximum_window_height_in_pixels', 700)
 
