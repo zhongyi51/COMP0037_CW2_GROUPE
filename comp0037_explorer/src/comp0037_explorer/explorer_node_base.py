@@ -242,12 +242,13 @@ class ExplorerNodeBase(object):
             cur_time = rospy.get_time()
             cur_coverage = self._findCurrentDiscoverage()
             fp = open(FILETO, 'a+')
+            # the discoverage is in percentage
             print >> fp, 'Thread Runtime is: ',  cur_time - self._start_time
             print >> fp, 'Thread Time Diff is: ', cur_time - self._pre_time
             print >> fp, 'Thread Discoverage is: ', cur_coverage * 100
             print >> fp, 'Thread debug: ', cur_coverage, self._pre_coverage
             print >> fp, 'Thread Discoverage Diff is: ', (cur_coverage - self._pre_coverage) * 100
-            print >> fp, 'Thread Speed of Discoverage is:', (cur_coverage - self._pre_coverage)/(cur_time - self._pre_time)
+            print >> fp, 'Thread Speed of Discoverage is:', (cur_coverage - self._pre_coverage)/(cur_time - self._pre_time) * 100
             print >> fp
             fp.close()
             self._pre_time, self._pre_coverage = cur_time, cur_coverage
