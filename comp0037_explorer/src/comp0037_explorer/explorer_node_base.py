@@ -247,6 +247,7 @@ class ExplorerNodeBase(object):
             print >> fp, 'Thread Discoverage is: ', cur_coverage * 100
             print >> fp, 'Thread Discoverage Diff is: ', (cur_coverage - self._pre_coverage) * 100
             print >> fp, 'Thread Speed of Discoverage is:', 1.0*(cur_coverage - self._pre_coverage)/(cur_time - self._pre_time)
+            print
             fp.close()
             self._pre_time, self._pre_coverage = cur_time, cur_coverage
 
