@@ -1,7 +1,7 @@
 import rospy
 import threading
 import math
-from time import time
+from time import strftime
 
 from comp0037_mapper.msg import *
 from comp0037_mapper.srv import *
@@ -10,7 +10,7 @@ from comp0037_reactive_planner_controller.occupancy_grid import OccupancyGrid
 from comp0037_reactive_planner_controller.grid_drawer import OccupancyGridDrawer
 from geometry_msgs.msg  import Twist
 
-FILETO = "/home/ros_user/Desktop/data_cw2/task_2_2_{}.txt".format(time.strftime("m%d_%H%M%S"))
+FILETO = "/home/ros_user/Desktop/data_cw2/task_2_2_{}.txt".format(strftime("m%d_%H%M%S"))
 
 class ExplorerNodeBase(object):
 
