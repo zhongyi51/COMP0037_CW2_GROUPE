@@ -6,6 +6,7 @@ import threading
 from cell import CellLabel
 from planner_controller_base import PlannerControllerBase
 from comp0037_mapper.msg import *
+from copy import deepcopy
 
 # from the definitions in occupancy_grid.py
 BLOCKED = 1
@@ -19,6 +20,7 @@ class ReactivePlannerController(PlannerControllerBase):
         self.mapUpdateSubscriber = rospy.Subscriber('updated_map', MapUpdate, self.mapUpdateCallback)
         self.gridUpdateLock =  threading.Condition()
         self.currentPlannedPath = None
+        self.lastPlannedPath = None # my mod for bad path. ie. to entering always trying to get into a unreachable goal problem.
 
     def mapUpdateCallback(self, mapUpdateMessage):
 
@@ -79,7 +81,11 @@ class ReactivePlannerController(PlannerControllerBase):
                               goalCellCoords[0], goalCellCoords[1])
                 return False
 
+            if self._isWaypointsOfPathsEqual(self.lastPlannedPath, self.currentPlannedPath):         # my mod: for discovering a intrigueing situation
+                rospy.logwarn('Two same path decided to a goal detected. they are', list(self.lastPlannedPath.waypoints), 'and', list(self.currentPlannedPath.waypoints))
+
             # Extract the path
+            self.lastPlannedPath = deepcopy(self.currentPlannedPath) # my mod: make a copy to compare later
             self.currentPlannedPath = self.planner.extractPathToGoal()
 
             # Drive along the path towards the goal. This returns True
@@ -92,3 +98,18 @@ class ReactivePlannerController(PlannerControllerBase):
             rospy.logerr('goalReached=%d', goalReached)
 
         return goalReached
+
+        # my mod: for discovering a intrigueing situation
+        def _isWaypointsOfPathsEqual(fromPath, toPath):
+            '''check if two routes are the same, to prevent entering a forever loop setting unreachable goal when the map is fully explored'''
+            print 'Checking for wps equaility.' # debug del
+            if not fromPath or not toPath or not fromPath.waypoints or not toPath.waypoints or len(fromPath) != len(toPath):
+                return False
+
+            fromWps, toWps = fromPath.waypoints, toPath.waypoints
+            for wp1, wp2 in zip(fromWps, toWps):
+                print wp1.coords, wp2.coords # debug del
+                if wp1.coords != wp2.coords:
+                    return False
+
+            return True
