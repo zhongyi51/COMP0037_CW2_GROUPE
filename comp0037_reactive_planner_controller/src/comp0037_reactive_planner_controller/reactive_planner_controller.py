@@ -81,7 +81,7 @@ class ReactivePlannerController(PlannerControllerBase):
                               goalCellCoords[0], goalCellCoords[1])
                 return False
 
-            if self._isWaypointsOfPathsEqual(self.lastPlannedPath, self.currentPlannedPath):
+            if self._isWaypointsOfPathsEqual(self.lastPlannedPath, self.currentPlannedPath):         # my mod: for discovering a intrigueing situation
                 rospy.logwarn('Two same path decided to a goal detected. they are', list(self.lastPlannedPath.waypoints), 'and', list(self.currentPlannedPath.waypoints))
 
             # Extract the path
@@ -99,6 +99,7 @@ class ReactivePlannerController(PlannerControllerBase):
 
         return goalReached
 
+        # my mod: for discovering a intrigueing situation
         def _isWaypointsOfPathsEqual(fromPath, toPath):
             '''check if two routes are the same, to prevent entering a forever loop setting unreachable goal when the map is fully explored'''
             print 'Checking for wps equaility.' # debug del
