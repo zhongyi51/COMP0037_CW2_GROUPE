@@ -10,7 +10,7 @@ class ExplorerNode(ExplorerNodeBase):
     def __init__(self):
 
         self.blackList = []
-	self.frontierList=[]
+        self.frontierList=[]
         self.coordinates=[0,0]
 
         ExplorerNodeBase.__init__(self)
@@ -23,7 +23,7 @@ class ExplorerNode(ExplorerNodeBase):
                 if self.isFrontierCell(x, y) is True and candidate not in self.blackList:
                     new_frontierList.append(candidate)
 
-        #print "The frontierList is:"+str(self.frontierList)
+        # print "The frontierList is:"+str(self.frontierList) # debug del
 
         if len(new_frontierList)!=0:
             self.frontierList=new_frontierList[:]
@@ -40,10 +40,10 @@ class ExplorerNode(ExplorerNodeBase):
 #         for coords in self.blackList:
 #             print str(coords)
 
-        if self.updateFrontiers()==True:
+        if self.frontierList:
 
-            minD=99999
-            minCell=[0,0]
+            minD=99999999
+            minCell=self.frontierList[0]
             print "Current position:"+str(self.coordinates)
 
 
