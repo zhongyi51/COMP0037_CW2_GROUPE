@@ -197,7 +197,6 @@ class ExplorerNodeBase(object):
         print >> fp, 'Discoverage rate is: ', discoveage/total_time
         fp.close()
 
-
     class ExplorerThread(threading.Thread):
         def __init__(self, explorer):
             threading.Thread.__init__(self)
@@ -254,6 +253,7 @@ class ExplorerNodeBase(object):
             print >> fp, 'Thread Speed of Discoverage is:', (cur_coverage - self._pre_coverage)/(cur_time - self._pre_time) * 100
             print >> fp
             fp.close()
+
             self._pre_time, self._pre_coverage = cur_time, cur_coverage
 
         # my mod: check for the coverage. Very bad but simple implementation for now. It scans through the whole map to check for if cells are visited.
