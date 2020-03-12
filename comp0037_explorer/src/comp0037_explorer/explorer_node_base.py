@@ -13,7 +13,7 @@ from time import strftime
 from subprocess import Popen, call
 
 call("[ ! -d {0} ] &&  mkdir {0}".format('/home/ros_user/Desktop/data_cw2/'), shell=True)
-FILETO = "/home/ros_user/Desktop/data_cw2/task22_{}.txt".format(strftime("%m%d_%H%M%S"))
+FILETO = "/home/ros_user/Desktop/data_cw2/task22_largest{}.txt".format(strftime("%m%d_%H%M%S"))
 
 class ExplorerNodeBase(object):
 

@@ -8,7 +8,6 @@ from explorer_node_base import ExplorerNodeBase
 class ExplorerNode(ExplorerNodeBase):
 
     def __init__(self):
-        print "I am explorer_node_closest.py" # debug del
 
         self.blackList = []
         self.frontierList=[]
@@ -41,10 +40,10 @@ class ExplorerNode(ExplorerNodeBase):
 #         for coords in self.blackList:
 #             print str(coords)
 
-        if self.updateFrontiers()==True:
+        if self.frontierList:
 
-            minD=99999
-            minCell=[0,0]
+            minD=99999999
+            minCell=self.frontierList[0]
             print "Current position:"+str(self.coordinates)
 
 
@@ -63,5 +62,3 @@ class ExplorerNode(ExplorerNodeBase):
         if goalReached is False:
 #             print 'Adding ' + str(goal) + ' to the naughty step'
             self.blackList.append(goal)
-        else:
-            self.coordinates=goal
