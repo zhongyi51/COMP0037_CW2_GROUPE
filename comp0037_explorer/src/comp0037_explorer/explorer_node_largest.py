@@ -10,7 +10,7 @@ class ExplorerNode(ExplorerNodeBase):
     def __init__(self):
 
         self.blackList = []
-	self.frontierList=[]
+        self.frontierList=[]
         self.coordinates=[0,0]
 
         ExplorerNodeBase.__init__(self)
@@ -22,7 +22,7 @@ class ExplorerNode(ExplorerNodeBase):
                 candidate=(x,y)
                 if self.isFrontierCell(x, y) is True and candidate not in self.blackList:
                     new_frontierList.append(candidate)
-        
+
         print "The frontierList is:"+str(self.frontierList)
 
         if len(new_frontierList)!=0:
@@ -30,10 +30,10 @@ class ExplorerNode(ExplorerNodeBase):
             return True
 
         return False
-                
-	
+
+
     def isnear(self,cell,newcell):
-        if abs(newcell[0]-cell[0])<=1 and abs(newcell[1]-cell[1])<=1 and newcell!=cell
+        if abs(newcell[0]-cell[0])<=1 and abs(newcell[1]-cell[1])<=1 and newcell != cell:
             return True
         return False
 
@@ -42,30 +42,28 @@ class ExplorerNode(ExplorerNodeBase):
 #         print 'blackList:'
 #         for coords in self.blackList:
 #             print str(coords)
-        
-        if self.updateFrontiers()==True:
-            
+
+        if self.frontierList:
+
             maxcellnumber=0
-            maxCell=[0,0]
+            maxCell= self.frontierList[0]
             for i in self.frontierList:
                 nearcellnumber=0
                 for j in self.frontierList:
-                    if isnear(i,j)==True:
+                    if self.isnear(i,j)==True:
                         nearcellnumber+=1
-                
+
                 if nearcellnumber>maxcellnumber:
                     maxcellnumber=nearcellnumber
                     maxCell=i
 
             print "max cell is:"+str(maxCell)
             return True,maxCell
-            
+
         return False,None
-    
+
 
     def destinationReached(self, goal, goalReached):
         if goalReached is False:
 #             print 'Adding ' + str(goal) + ' to the naughty step'
             self.blackList.append(goal)
-        else:
-            self.coordinates=goal
