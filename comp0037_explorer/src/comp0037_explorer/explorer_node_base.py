@@ -13,7 +13,7 @@ from time import strftime
 from subprocess import Popen, call
 
 call("[ ! -d {0} ] &&  mkdir {0}".format('/home/ros_user/Desktop/data_cw2/'), shell=True)
-FILETO = "/home/ros_user/Desktop/data_cw2/task22_largest{}.txt".format(strftime("%m%d_%H%M%S"))
+FILETO = "/home/ros_user/Desktop/data_cw2/task22_wavefront_closest_{}.txt".format(strftime("%m%d_%H%M%S"))
 
 class ExplorerNodeBase(object):
 
@@ -85,7 +85,7 @@ class ExplorerNodeBase(object):
     def isFrontierCell(self, x, y):
 
         # Check the cell to see if it's open
-        if self.occupancyGrid.getCell(x, y) != 0:
+        if self.occupancyGrid.getCell(x, y) != 0.0 or self.occupancyGrid.getCell(x, y) != 0:
             return False
 
         # Check the neighbouring cells; if at least one of them is unknown, it's a frontier
@@ -250,7 +250,10 @@ class ExplorerNodeBase(object):
             print >> fp, 'Thread Discoverage is: ', cur_coverage * 100
             print >> fp, 'Thread debug: ', cur_coverage, self._pre_coverage
             print >> fp, 'Thread Discoverage Diff is: ', (cur_coverage - self._pre_coverage) * 100
-            print >> fp, 'Thread Speed of Discoverage is:', (cur_coverage - self._pre_coverage)/(cur_time - self._pre_time) * 100
+            try:
+                print >> fp, 'Thread Speed of Discoverage is:', (cur_coverage - self._pre_coverage)/(cur_time - self._pre_time) * 100
+            except ZeroDivisionError:
+                pass
             print >> fp
             fp.close()
 

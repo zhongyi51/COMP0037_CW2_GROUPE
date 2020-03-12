@@ -9,8 +9,8 @@ from comp0037_mapper.msg import *
 from copy import deepcopy
 
 # from the definitions in occupancy_grid.py
-BLOCKED = 1
-FREE = 0
+BLOCKED = 1.0
+FREE = 0.0
 
 class ReactivePlannerController(PlannerControllerBase):
 
@@ -45,8 +45,9 @@ class ReactivePlannerController(PlannerControllerBase):
         # my mod: check through the waypoints on the current planned path, to see if any one is blocked from the perceptions of robot
         for wp in self.currentPlannedPath.waypoints:
             x,y = wp.coords
+            print 'checking is x,y good: ', x, y #debug del
             status = self.occupancyGrid.getCell(x,y)
-            if status == BLOCKED: # check status from the continuously updating occupancy grid
+            if status == BLOCKED or status == 1: # check status from the continuously updating occupancy grid
                 print 'coords = ', x, y, 'status = ', status, 'Now stop and replan' # debug del
                 self.controller.stopDrivingToCurrentGoal() # stop the robot
                 break
@@ -75,14 +76,16 @@ class ReactivePlannerController(PlannerControllerBase):
             pathToGoalFound = self.planner.search(startCellCoords, goalCellCoords)
             self.gridUpdateLock.release()
 
+            # my mod: debug
+            if self._isWaypointsOfPathsEqual(self.lastPlannedPath, self.currentPlannedPath):         # my mod: for discovering a intrigueing situation
+                rospy.logwarn('Two same path decided to a goal detected. they are', list(self.lastPlannedPath.waypoints), 'and', list(self.currentPlannedPath.waypoints))
+
             # If we can't reach the goal, give up and return
             if pathToGoalFound is False:
                 rospy.logwarn("Could not find a path to the goal at (%d, %d)", \
                               goalCellCoords[0], goalCellCoords[1])
+                self.controller.stopDrivingToCurrentGoal() # my mod: stop here
                 return False
-
-            if self._isWaypointsOfPathsEqual(self.lastPlannedPath, self.currentPlannedPath):         # my mod: for discovering a intrigueing situation
-                rospy.logwarn('Two same path decided to a goal detected. they are', list(self.lastPlannedPath.waypoints), 'and', list(self.currentPlannedPath.waypoints))
 
             # Extract the path
             self.lastPlannedPath = deepcopy(self.currentPlannedPath) # my mod: make a copy to compare later
