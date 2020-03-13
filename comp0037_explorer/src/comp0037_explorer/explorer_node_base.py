@@ -197,6 +197,17 @@ class ExplorerNodeBase(object):
         print >> fp, 'Discoverage rate is: ', discoveage/total_time
         fp.close()
 
+    def calculateentropy(self):
+
+        hm=0
+        for x in range(0, self.occupancyGrid.getWidthInCells()):
+            for y in range(0, self.occupancyGrid.getHeightInCells()):
+                pc=self.occupancyGrid.getCell(x, y)
+                hc=math.log(2)
+                if pc==0.5:                    
+                    hm+=hc
+        return hm
+
     class ExplorerThread(threading.Thread):
         def __init__(self, explorer):
             threading.Thread.__init__(self)
@@ -232,6 +243,7 @@ class ExplorerNodeBase(object):
                 # Convert to world coordinates, because this is what the robot understands
                 if newDestinationAvailable is True:
                     print 'newDestination = ' + str(newDestination)
+                    print "entropy of current map is"+str(self.explorer.calculateentropy())
                     newDestinationInWorldCoordinates = self.explorer.occupancyGrid.getWorldCoordinatesFromCellCoordinates(newDestination)
                     attempt = self.explorer.sendGoalToRobot(newDestinationInWorldCoordinates)
                     self.explorer.destinationReached(newDestination, attempt)
@@ -239,6 +251,7 @@ class ExplorerNodeBase(object):
                     self.completed = True
 
                 self._update_and_print_thread_info() # my mod: for analysising data
+                 
 
         def _update_and_print_thread_info(self):
             cur_time = rospy.get_time()
