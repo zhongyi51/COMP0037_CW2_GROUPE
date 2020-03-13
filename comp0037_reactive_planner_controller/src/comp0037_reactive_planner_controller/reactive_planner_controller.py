@@ -95,8 +95,9 @@ class ReactivePlannerController(PlannerControllerBase):
             # if the goal was successfully reached. The controller
             # should stop the robot and return False if the
             # stopDrivingToCurrentGoal method is called.
-            goalReached = self.controller.drivePathToGoal(self.currentPlannedPath, \
-                                                          goal.theta, self.planner.getPlannerDrawer())
+            # goalReached = self.controller.drivePathToGoal(self.currentPlannedPath, goal.theta, self.planner.getPlannerDrawer())
+            goalReached = self.controller.drivePathToGoal(self.currentPlannedPath, None, self.planner.getPlannerDrawer())
+
 
             rospy.logerr('goalReached=%d', goalReached)
 

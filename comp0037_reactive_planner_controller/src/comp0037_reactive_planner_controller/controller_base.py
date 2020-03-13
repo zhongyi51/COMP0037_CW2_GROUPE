@@ -82,6 +82,7 @@ class ControllerBase(object):
     # Drive to each waypoint in turn. Unfortunately we have to add
     # the planner drawer because we have to keep updating it to
     # make sure the graphics are redrawn properly.
+    # my mod:
     def drivePathToGoal(self, path, goalOrientation, plannerDrawer):
 
         self.abortCurrentGoal = False
@@ -108,7 +109,9 @@ class ControllerBase(object):
             if rospy.is_shutdown() is True:
                 return False
 
-        rospy.loginfo('Rotating to goal orientation (' + str(goalOrientation) + ')')
-
-        # Finish off by rotating the robot to the final configuration
-        return self.rotateToGoalOrientation(goalOrientation)
+        # my mod:
+        if goalOrientation:
+            rospy.loginfo('Rotating to goal orientation (' + str(goalOrientation) + ')')
+            return self.rotateToGoalOrientation(goalOrientation)
+        else:
+            return (not self.abortCurrentGoal)
