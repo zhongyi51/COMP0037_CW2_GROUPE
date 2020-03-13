@@ -30,17 +30,19 @@ class ExplorerNode(ExplorerNodeBase):
 
 
     def updateFrontiers(self): # TODO: implement this !!!
-        print 'current frontier list is:', self.frontierList
+        # print 'current frontier list is:', self.frontierList
         new_frontierList = []
         self._dps(self.occupancyGrid, new_frontierList)
-        print 'new list is: ', new_frontierList
-        self.frontierList = new_frontierList[:]
+        if new_frontierList:
+            print 'new list is: ', new_frontierList
+            self.frontierList = new_frontierList[:]
+            return True
 
     def chooseNewDestination(self):
 
         print 'blackList:', [coords for coords in self.blackList]
 
-        if self.frontierList:
+        if self.updateFrontiers() or self.frontierList:
 
             minD=99999999
             minCell=(-1,-1)
