@@ -81,26 +81,29 @@ class ExplorerNode(ExplorerNodeBase):
 
     # my mod: helper
     def _dpsHelper(self, x, y, visited, width, height, map, lst):
-        candidate = (x,y,)
-        if x < 0 or y < 0 or x > width or y > height:
-            return
+        stack = [(x+1, y,), (x-1, y,), (x, y+1,), (x, y-1,)]
 
-        if candidate in visited: 
-            return
+        while stack:
+            # print 'debug stack:', stack
+            candidate = stack.pop()
+            x, y = candidate
+            if x < 0 or y < 0 or x > width or y > height:
+                # print x,y,'out of bound'
+                continue
 
-        if candidate in self.blackList or map.getCell(x,y) != 0.0 or map.getCell(x,y) != 0:
-            return
+            if candidate in visited:
+                continue
 
-        visited.append(candidate)
-        # print 'candidate:', x,y, self.occupancyGrid.getCell(candidate[0], candidate[1]), width, height # debug
-        if self.isFrontierCell(x,y):
-            lst.append(candidate) # the actuation
+            if candidate in self.blackList or map.getCell(x,y) != 0.0 or map.getCell(x,y) != 0:
+                # print x,y, 'others'
+                continue
 
-        # floodfill 4 angles only, I dont really like diagonal route, possibly try it seperatly later
-        self._dpsHelper(x+1, y, visited, width, height, map,lst)
-        self._dpsHelper(x-1, y, visited, width, height, map,lst)
-        self._dpsHelper(x, y+1, visited, width, height, map,lst)
-        self._dpsHelper(x, y-1, visited, width, height, map,lst)
+            visited.append(candidate)
+            if self.isFrontierCell(x,y):
+                lst.append(candidate) # the actuation
+
+            # floodfill 4 angles only, I dont really like diagonal route, possibly try it seperatly later
+            stack += [(x+1, y,), (x-1, y,), (x, y+1,), (x, y-1,)]
         return True
 
     def _init_searchStartPos(self): # maybe not needed if the initialization of cur robot position initializatoin is handled well ennough
