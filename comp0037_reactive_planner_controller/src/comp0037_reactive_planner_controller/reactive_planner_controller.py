@@ -45,7 +45,6 @@ class ReactivePlannerController(PlannerControllerBase):
         # my mod: check through the waypoints on the current planned path, to see if any one is blocked from the perceptions of robot
         for wp in self.currentPlannedPath.waypoints:
             x,y = wp.coords
-            print 'checking is x,y good: ', x, y #debug del
             status = self.occupancyGrid.getCell(x,y)
             if status == BLOCKED or status == 1: # check status from the continuously updating occupancy grid
                 print 'coords = ', x, y, 'status = ', status, 'Now stop and replan' # debug del
@@ -76,10 +75,6 @@ class ReactivePlannerController(PlannerControllerBase):
             pathToGoalFound = self.planner.search(startCellCoords, goalCellCoords)
             self.gridUpdateLock.release()
 
-            # my mod: debug
-            if self._isWaypointsOfPathsEqual(self.lastPlannedPath, self.currentPlannedPath):         # my mod: for discovering a intrigueing situation
-                rospy.logwarn('Two same path decided to a goal detected. they are', list(self.lastPlannedPath.waypoints), 'and', list(self.currentPlannedPath.waypoints))
-
             # If we can't reach the goal, give up and return
             if pathToGoalFound is False:
                 rospy.logwarn("Could not find a path to the goal at (%d, %d)", \
@@ -104,16 +99,16 @@ class ReactivePlannerController(PlannerControllerBase):
         return goalReached
 
         # my mod: for discovering a intrigueing situation
-        def _isWaypointsOfPathsEqual(fromPath, toPath):
-            '''check if two routes are the same, to prevent entering a forever loop setting unreachable goal when the map is fully explored'''
-            print 'Checking for wps equaility.' # debug del
-            if not fromPath or not toPath or not fromPath.waypoints or not toPath.waypoints or len(fromPath) != len(toPath):
-                return False
-
-            fromWps, toWps = fromPath.waypoints, toPath.waypoints
-            for wp1, wp2 in zip(fromWps, toWps):
-                print wp1.coords, wp2.coords # debug del
-                if wp1.coords != wp2.coords:
-                    return False
-
-            return True
+        # def _isWaypointsOfPathsEqual(fromPath, toPath):
+        #     '''check if two routes are the same, to prevent entering a forever loop setting unreachable goal when the map is fully explored'''
+        #     print 'Checking for wps equaility.' # debug del
+        #     if not fromPath or not toPath or not fromPath.waypoints or not toPath.waypoints or len(fromPath) != len(toPath):
+        #         return False
+        #
+        #     fromWps, toWps = fromPath.waypoints, toPath.waypoints
+        #     for wp1, wp2 in zip(fromWps, toWps):
+        #         print wp1.coords, wp2.coords # debug del
+        #         if wp1.coords != wp2.coords:
+        #             return False
+        #
+        #     return True
