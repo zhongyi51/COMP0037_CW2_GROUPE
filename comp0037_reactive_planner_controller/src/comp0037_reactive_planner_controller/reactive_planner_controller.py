@@ -9,8 +9,8 @@ from comp0037_mapper.msg import *
 from copy import deepcopy
 
 # from the definitions in occupancy_grid.py
-BLOCKED = 1
-FREE = 0
+BLOCKED = 1.0
+FREE = 0.0
 
 class ReactivePlannerController(PlannerControllerBase):
 
@@ -46,7 +46,7 @@ class ReactivePlannerController(PlannerControllerBase):
         for wp in self.currentPlannedPath.waypoints:
             x,y = wp.coords
             status = self.occupancyGrid.getCell(x,y)
-            if status == BLOCKED: # check status from the continuously updating occupancy grid
+            if status == BLOCKED or status == 1: # check status from the continuously updating occupancy grid
                 print 'coords = ', x, y, 'status = ', status, 'Now stop and replan' # debug del
                 self.controller.stopDrivingToCurrentGoal() # stop the robot
                 break
@@ -79,10 +79,8 @@ class ReactivePlannerController(PlannerControllerBase):
             if pathToGoalFound is False:
                 rospy.logwarn("Could not find a path to the goal at (%d, %d)", \
                               goalCellCoords[0], goalCellCoords[1])
+                self.controller.stopDrivingToCurrentGoal() # my mod: stop here
                 return False
-
-            if self._isWaypointsOfPathsEqual(self.lastPlannedPath, self.currentPlannedPath):         # my mod: for discovering a intrigueing situation
-                rospy.logwarn('Two same path decided to a goal detected. they are', list(self.lastPlannedPath.waypoints), 'and', list(self.currentPlannedPath.waypoints))
 
             # Extract the path
             self.lastPlannedPath = deepcopy(self.currentPlannedPath) # my mod: make a copy to compare later
@@ -92,24 +90,25 @@ class ReactivePlannerController(PlannerControllerBase):
             # if the goal was successfully reached. The controller
             # should stop the robot and return False if the
             # stopDrivingToCurrentGoal method is called.
-            goalReached = self.controller.drivePathToGoal(self.currentPlannedPath, \
-                                                          goal.theta, self.planner.getPlannerDrawer())
+            # goalReached = self.controller.drivePathToGoal(self.currentPlannedPath, goal.theta, self.planner.getPlannerDrawer())
+            goalReached = self.controller.drivePathToGoal(self.currentPlannedPath, None, self.planner.getPlannerDrawer())
+
 
             rospy.logerr('goalReached=%d', goalReached)
 
         return goalReached
 
         # my mod: for discovering a intrigueing situation
-        def _isWaypointsOfPathsEqual(fromPath, toPath):
-            '''check if two routes are the same, to prevent entering a forever loop setting unreachable goal when the map is fully explored'''
-            print 'Checking for wps equaility.' # debug del
-            if not fromPath or not toPath or not fromPath.waypoints or not toPath.waypoints or len(fromPath) != len(toPath):
-                return False
-
-            fromWps, toWps = fromPath.waypoints, toPath.waypoints
-            for wp1, wp2 in zip(fromWps, toWps):
-                print wp1.coords, wp2.coords # debug del
-                if wp1.coords != wp2.coords:
-                    return False
-
-            return True
+        # def _isWaypointsOfPathsEqual(fromPath, toPath):
+        #     '''check if two routes are the same, to prevent entering a forever loop setting unreachable goal when the map is fully explored'''
+        #     print 'Checking for wps equaility.' # debug del
+        #     if not fromPath or not toPath or not fromPath.waypoints or not toPath.waypoints or len(fromPath) != len(toPath):
+        #         return False
+        #
+        #     fromWps, toWps = fromPath.waypoints, toPath.waypoints
+        #     for wp1, wp2 in zip(fromWps, toWps):
+        #         print wp1.coords, wp2.coords # debug del
+        #         if wp1.coords != wp2.coords:
+        #             return False
+        #
+        #     return True

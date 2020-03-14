@@ -2,7 +2,7 @@
 
 import rospy
 
-from comp0037_explorer.explorer_node_largest import ExplorerNode
+from comp0037_explorer.explorer_node_wavefront_closest_iterative import ExplorerNode
 
 if __name__ == '__main__':
     try:

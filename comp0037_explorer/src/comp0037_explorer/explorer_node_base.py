@@ -13,7 +13,7 @@ from time import strftime
 from subprocess import Popen, call
 
 call("[ ! -d {0} ] &&  mkdir {0}".format('/home/ros_user/Desktop/data_cw2/'), shell=True)
-FILETO = "/home/ros_user/Desktop/data_cw2/task22_largest{}.txt".format(strftime("%m%d_%H%M%S"))
+FILETO = "/home/ros_user/Desktop/data_cw2/task22_wavefront_closest_{}.txt".format(strftime("%m%d_%H%M%S"))
 
 class ExplorerNodeBase(object):
 
@@ -85,7 +85,7 @@ class ExplorerNodeBase(object):
     def isFrontierCell(self, x, y):
 
         # Check the cell to see if it's open
-        if self.occupancyGrid.getCell(x, y) != 0:
+        if self.occupancyGrid.getCell(x, y) != 0.0 or self.occupancyGrid.getCell(x, y) != 0:
             return False
 
         # Check the neighbouring cells; if at least one of them is unknown, it's a frontier
@@ -197,6 +197,17 @@ class ExplorerNodeBase(object):
         print >> fp, 'Discoverage rate is: ', discoveage/total_time
         fp.close()
 
+    def calculateentropy(self):
+
+        hm=0
+        for x in range(0, self.occupancyGrid.getWidthInCells()):
+            for y in range(0, self.occupancyGrid.getHeightInCells()):
+                pc=self.occupancyGrid.getCell(x, y)
+                hc=math.log(2)
+                if pc==0.5:                    
+                    hm+=hc
+        return hm
+
     class ExplorerThread(threading.Thread):
         def __init__(self, explorer):
             threading.Thread.__init__(self)
@@ -232,6 +243,7 @@ class ExplorerNodeBase(object):
                 # Convert to world coordinates, because this is what the robot understands
                 if newDestinationAvailable is True:
                     print 'newDestination = ' + str(newDestination)
+                    print "entropy of current map is"+str(self.explorer.calculateentropy())
                     newDestinationInWorldCoordinates = self.explorer.occupancyGrid.getWorldCoordinatesFromCellCoordinates(newDestination)
                     attempt = self.explorer.sendGoalToRobot(newDestinationInWorldCoordinates)
                     self.explorer.destinationReached(newDestination, attempt)
@@ -239,6 +251,7 @@ class ExplorerNodeBase(object):
                     self.completed = True
 
                 self._update_and_print_thread_info() # my mod: for analysising data
+                 
 
         def _update_and_print_thread_info(self):
             cur_time = rospy.get_time()
@@ -250,7 +263,10 @@ class ExplorerNodeBase(object):
             print >> fp, 'Thread Discoverage is: ', cur_coverage * 100
             print >> fp, 'Thread debug: ', cur_coverage, self._pre_coverage
             print >> fp, 'Thread Discoverage Diff is: ', (cur_coverage - self._pre_coverage) * 100
-            print >> fp, 'Thread Speed of Discoverage is:', (cur_coverage - self._pre_coverage)/(cur_time - self._pre_time) * 100
+            try:
+                print >> fp, 'Thread Speed of Discoverage is:', (cur_coverage - self._pre_coverage)/(cur_time - self._pre_time) * 100
+            except ZeroDivisionError:
+                pass
             print >> fp
             fp.close()
 
