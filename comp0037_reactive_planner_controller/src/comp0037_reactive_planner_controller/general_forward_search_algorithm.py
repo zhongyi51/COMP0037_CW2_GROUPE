@@ -19,6 +19,12 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
     def __init__(self, title, occupancyGrid):
         PlannerBase.__init__(self, title, occupancyGrid)
 
+        # Use the search grid to see if the start or destination are
+        # good. This is a parameter because we want to preserve the
+        # old behaviour for people who have used it in their coursework
+        self.useSearchGridToValidateStartAndEnd = \
+            rospy.get_param('use_search_grid_to_validate_start_and_end', True)
+
         # If the goal cell is occupied, the planner will still find a
         # route. If the following flag is set to true the planner
         # will, however, not go to the goal but stop one cell short.
@@ -130,8 +136,10 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
         # path cost to 0.
         self.start = self.searchGrid.getCellFromCoords(startCoords)
 
-        #if self.start.label is CellLabel.OBSTRUCTED:
-        #    return False
+        # if (self.useSearchGridToValidateStartAndEnd is True) & \
+        #     (self.start.label is CellLabel.OBSTRUCTED):
+        #     print 'Start is blocked'
+        #     return False
 
         self.start.label = CellLabel.START
         self.start.pathCost = 0
@@ -139,8 +147,10 @@ class GeneralForwardSearchAlgorithm(PlannerBase):
         self.goal = self.searchGrid.getCellFromCoords(goalCoords)
         self.goalCellLabel = self.goal.label
 
-        #if self.goal.label is CellLabel.OBSTRUCTED:
-        #    return False
+        if (self.useSearchGridToValidateStartAndEnd is True) & \
+            (self.goal.label is CellLabel.OBSTRUCTED):
+            print 'Goal {} is blocked'.format(self.goal.coords)
+            return False
 
         self.goal.label = CellLabel.GOAL
 
