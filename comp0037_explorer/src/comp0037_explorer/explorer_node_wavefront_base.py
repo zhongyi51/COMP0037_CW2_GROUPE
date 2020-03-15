@@ -13,6 +13,17 @@ class ExplorerNodeWavefrontBase(ExplorerNodeBase):
         ExplorerNodeBase.__init__(self)
         self._odometrySubscriber = rospy.Subscriber('/robot0/odom', Odometry, self._callback) # added for tracking current robot position
 
+        self._reset_wavefront_attribute_states()
+
+    def _reset_wavefront_attribute_states(self):
+        self.q_m = []
+        self.q_f = []
+        self.map_open = []
+        self.map_close = []
+        self.frontier_open = []
+        self.frontier_close = []
+        self.new_frontiers = []
+
     def _callback(self, odometry):
         odometryPose = odometry.pose.pose
         position = odometryPose.position
@@ -30,8 +41,9 @@ class ExplorerNodeWavefrontBase(ExplorerNodeBase):
     def updateFrontiers(self): # TODO: implement this !!!
         # print 'current frontier list is:', self.frontierList
         new_frontierList = []
-        self._dps(self.occupancyGrid, new_frontierList)
+        self._wavefront(new_frontierList)
         if new_frontierList:
+            print 'blackList is: ', self.blackList
             print 'new list is: ', new_frontierList
             self.frontierList = new_frontierList[:]
             return True
@@ -42,48 +54,71 @@ class ExplorerNodeWavefrontBase(ExplorerNodeBase):
         if goalReached is False:
 #             print 'Adding ' + str(goal) + ' to the naughty step'
             self.blackList.append(goal)
-            if goal in self.frontierList: #my mod: There is a case where the single logic flow in other objects due to original implementation caused never updating the frontier list. This solved the problem
-                self.updateFrontiers()
 
     # my mod: wavefront dps
-    def _dps(self, map, lst):
+    def _wavefront(self, lst):
         if not self._searchStartPos:
             self._init_searchStartPos()
 
         if not self._pose:
             self._pose = self._searchStartPos
 
-        w, h = map.getWidthInCells(), map.getHeightInCells()
-        x, y = self._pose
+        pose = self._pose
         # print 'pose:', self._pose
-        visited = [] # ref
-        self._dpsHelper(x, y, visited, w, h, map, lst)
+        self._reset_wavefront_attribute_states()
+        self._wavefrontHelper(pose, lst)
 
-    def _dpsHelper(self, x, y, visited, width, height, map, lst):
-        stack = [(x+1, y,), (x-1, y,), (x, y+1,), (x, y-1,)]
+    def _wavefrontHelper(self, pose, lst):
+        self.q_m = [pose]
+        self.map_open.append(pose)
 
-        while stack:
-            # print 'debug stack:', stack
-            candidate = stack.pop()
-            x, y = candidate
-            if x < 0 or y < 0 or x >= width or y >= height:
-                # print x,y,'out of bound'
+        while self.q_m:
+            # print 'q_m: ', self.q_m
+            p = self.q_m.pop(0)
+            x_p, y_p = p
+
+            if p in self.map_close or p in self.blackList:
                 continue
 
-            if candidate in visited:
-                continue
+            if self.isFrontierCell(x_p,y_p):
+                self.q_f = []
+                self.new_frontiers = []
+                self.q_f.append(p)
+                self.frontier_open.append(p)
 
-            if candidate in self.blackList or map.getCell(x,y) != 0.0 or map.getCell(x,y) != 0:
-                # print x,y, 'others'
-                continue
+                while self.q_f:
+                    # print 'q_f: ', self.q_f
+                    q = self.q_f.pop(0)
+                    if q in self.map_close or q in self.frontier_close or q in self.blackList:
+                        continue
 
-            visited.append(candidate)
-            if self.isFrontierCell(x,y):
-                lst.append(candidate) # the actuation
+                    x_q, y_q = q
+                    if self.isFrontierCell(x_q, y_q):
+                        self.new_frontiers.append(q)
+                        for w in self._neighbours(q):
+                            if not w in self.frontier_open and not w in self.frontier_close and not w in self.map_close:
+                                self.q_f.append(w)
+                                self.frontier_open.append(w)
 
-            stack += [(x+1, y,), (x-1, y,), (x, y+1,), (x, y-1,)]
-        return True
+                    self.frontier_close.append(q)
+                lst += self.new_frontiers # save data
+                self.map_close += self.new_frontiers # mark frontiers to map close list
 
+            for v in self._neighbours(p):
+                if not v in self.map_open and not v in self.map_close and self._hasAtLeastOneOpenNeighbour(v):
+                    self.q_m.append(v)
+                    self.map_open.append(v)
+            self.map_close.append(p)
+
+    def _hasAtLeastOneOpenNeighbour(self, coord):
+        for neighbour in self._neighbours(coord):
+            x, y = neighbour
+            if self.occupancyGrid.getCell(x,y) == 0:
+                return True
+
+    def _neighbours(self, coord):
+        x, y = coord
+        return [(x + 1, y,), (x - 1, y,), (x, y + 1,), (x, y - 1,)]
 
     # maybe not needed if the initialization of cur robot position initializatoin is handled well ennough
     def _init_searchStartPos(self):

@@ -13,7 +13,7 @@ from time import strftime
 from subprocess import Popen, call
 
 call("[ ! -d {0} ] &&  mkdir {0}".format('/home/ros_user/Desktop/data_cw2/'), shell=True)
-FILETO = "/home/ros_user/Desktop/data_cw2/task22_wavefront_largest_{}.txt".format(strftime("%m%d_%H%M%S"))
+FILETO = "/home/ros_user/Desktop/data_cw2/task22_wavefront_closest_{}.txt".format(strftime("%m%d_%H%M%S"))
 
 class ExplorerNodeBase(object):
 
@@ -73,8 +73,8 @@ class ExplorerNodeBase(object):
         self.occupancyGrid.updateGridFromVector(msg.occupancyGrid)
         self.deltaOccupancyGrid.updateGridFromVector(msg.deltaOccupancyGrid)
 
-        # Update the frontiers
-        self.updateFrontiers()
+        # # Update the frontiers
+        # self.updateFrontiers()
 
         # Flag there's something to show graphically
         self.visualisationUpdateRequired = True
@@ -85,7 +85,7 @@ class ExplorerNodeBase(object):
     def isFrontierCell(self, x, y):
 
         # Check the cell to see if it's open
-        if self.occupancyGrid.getCell(x, y) != 0.0 or self.occupancyGrid.getCell(x, y) != 0:
+        if self.occupancyGrid.getCell(x, y) != 0:
             return False
 
         # Check the neighbouring cells; if at least one of them is unknown, it's a frontier

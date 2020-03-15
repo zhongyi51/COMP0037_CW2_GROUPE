@@ -16,6 +16,8 @@ class ExplorerNode(ExplorerNodeWavefrontBase):
             maxcellnumber=0
             maxCell= self.frontierList[0]
             for i in self.frontierList:
+                if i in self.blackList:
+                    continue
                 nearcellnumber=0
                 for j in self.frontierList:
                     if self.isnear(i,j)==True:
