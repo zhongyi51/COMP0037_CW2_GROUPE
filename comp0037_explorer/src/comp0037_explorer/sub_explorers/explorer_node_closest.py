@@ -15,22 +15,6 @@ class ExplorerNode(ExplorerNodeBase):
 
         ExplorerNodeBase.__init__(self)
 
-    def updateFrontiers(self): # TODO: implement this !!!
-        new_frontierList=[]
-        for x in range(0, self.occupancyGrid.getWidthInCells()):
-            for y in range(0, self.occupancyGrid.getHeightInCells()):
-                candidate=(x,y)
-                if self.isFrontierCell(x, y) is True and candidate not in self.blackList:
-                    new_frontierList.append(candidate)
-
-        #print "The frontierList is:"+str(self.frontierList)
-
-        if len(new_frontierList)!=0:
-            self.frontierList=new_frontierList[:]
-            return True
-
-        return False
-
     def chooseNewDestination(self):
 
 #         print 'blackList:'
@@ -52,10 +36,3 @@ class ExplorerNode(ExplorerNodeBase):
             return True,minCell
 
         return False,None
-
-    def destinationReached(self, goal, goalReached):
-        if goalReached is False:
-#             print 'Adding ' + str(goal) + ' to the naughty step'
-            self.blackList.append(goal)
-        else:
-            self.coordinates=goal
