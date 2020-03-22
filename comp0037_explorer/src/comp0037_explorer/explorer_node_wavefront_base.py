@@ -113,6 +113,8 @@ class ExplorerNodeWavefrontBase(ExplorerNodeBase):
     def _hasAtLeastOneOpenNeighbour(self, coord):
         for neighbour in self._neighbours(coord):
             x, y = neighbour
+            if not 0 <= x < self.occupancyGrid.getWidthInCells() or not 0 <= y < self.occupancyGrid.getHeightInCells(): # out of range
+                return False
             if self.occupancyGrid.getCell(x,y) == 0:
                 return True
 
